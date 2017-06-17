@@ -9,9 +9,10 @@
              [non-empty? (non-empty-string? file)]
              [exist? (and non-empty? (or (file-exists? file) (directory-exists? file)))])
         (if exist?
-            (begin
-              (delete-directory/files file)
-              (printf "delete ignored file or dir:~a~n" file))
+            ;(begin
+            ;  (delete-directory/files file)
+            ;  (printf "delete ignored file or dir:~a~n" file))
+            (delete-directory/files file)
             (void))
         (find-and-delete-git-ignore in))
       (void)))
