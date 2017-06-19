@@ -10,8 +10,8 @@
                     (lambda (k)
                       (printf "k:~a~n" k)
                       (set! cc (compose k (curry * 5)))
-                      (* 2 (k x))
-                      ;(k x)
+                      ;(* 2 (k x))
+                      (k x)
                       (printf "cc:~a~n" cc)
                       ;(k printf)
                       (set! rst 1)
@@ -24,5 +24,7 @@
 
 (printf "func invoke~n")
 (printf "f1:~a,~a~n" (f1 3) rst)
+;(printf "f1:~a,~a,~a~n" (f1 3) (f1 4) rst)
+;(printf "f1:~a,~a,~a~n" (f1 3) (cc 4) rst)
 (printf "cc invoke~n")
 (printf "again:~a,~a~n" (cc 6) rst)
