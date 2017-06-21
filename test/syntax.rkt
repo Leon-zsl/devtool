@@ -93,3 +93,66 @@
 
 (define-integrable my-add (lambda (x y) (+ x y)))
 |#
+
+(define-syntax define-structure
+  (lambda (x)
+    (define gen-id
+      (lambda (template-id . args)
+        (datum->syntax template-id
+                       (string->symbol
+                        (apply string-append
+                               (map (lambda (x)
+                                      (if (string? x)
+                                          x
+                                          (symbol->string (syntax->datum x))))
+                                    args))))))
+    (syntax-case x ()
+      [(_ name field ...)
+       (with-syntax ([constructor (gen-id #'name "make-" #'name)]
+                     [predicate (gen-id #'name #'name "?")]
+                     [(access ...)
+                      (map (lambda (x) (gen-id x #'name "-" x))
+                           (syntax->list #'(field ...)))]
+                     [(assign ...)
+                      (map (lambda (x) (gen-id x "set-" #'name "-" x "!"))
+                           (syntax->list #'(field ...)))]
+                     [structure-length (+ (length (syntax->list #'(field ...))) 1)]
+                     [(index ...)
+                      (let f ([i 1] [ids (syntax->list #'(field ...))])
+                        (if (null? ids)
+                            '()
+                            (cons i (f (+ i 1) (cdr ids)))))])
+         #'(begin
+             (define constructor
+               (lambda (field ...)
+                 (vector 'name field ...)))
+             (define predicate
+               (lambda (x)
+                 (and (vector? x)
+                      (= (vector-length x) structure-length)
+                      (eq? (vector-ref x 0) 'name))))
+             (define access
+               (lambda (x)
+                 (vector-ref x index)))
+             ...
+             (define assign
+               (lambda (x update)
+                 (vector-set! x index update)))
+             ...
+             ))])))
+
+(define-structure tree left right)
+(define t (make-tree 1 2))
+(tree-left t)
+(displayln t)
+
+(define-syntax define-structure-simple
+  (lambda (x)
+    (syntax-case x ()
+      [(_ name field ...)
+       (with-syntax ([args (map (lambda (f) f)
+                                (syntax->list #'(field ...)))])
+         #''(name . args))])))
+
+(define st (define-structure-simple tree1 left1 right1))
+(displayln st)
