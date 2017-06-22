@@ -40,8 +40,6 @@
                  (lambda (ticks complete expire)
                    ((call/cc
                      (lambda (escape)
-                       (display escape)
-                       (display "\n")
                        (set! do-complete
                              (lambda (ticks value)
                                (display "do-complete\n")
@@ -54,7 +52,9 @@
                                (display "do expire\n")
                                (escape (lambda ()
                                          (expire (new-engine resume))))))
-                       (display "engine body\n")
+                       (display "start resume\n")
+                       (display resume)
+                       (display "\n")
                        (resume ticks)))))))
              (lambda (proc)
                (new-engine
@@ -72,32 +72,37 @@
               (lambda formals (decrement-timer) exp1 exp2 ...)]))
 
          (define fibonacci
-           (lambda (n)
-             (display "fib:\n")
-             (if (< n 2)
-                 n
-                 (+ (fibonacci (- n 1))
-                    (fibonacci (- n 2))))))
+           (timed-lambda (n)
+                         (display "fib:\n")
+                         (if (< n 2)
+                             n
+                             (+ (fibonacci (- n 1))
+                                (fibonacci (- n 2))))))
          (define eng
            (make-engine
             (lambda ()
+              (display "start fib\n")
               (fibonacci 3))))
          
-         (define eng1 (eng 5
-                           (lambda (ticks value) (display "enter complete 1\n") value)
-                           (lambda (new-eng)
-                             (display "enter expired 1\n")
-                             (set! eng new-eng)
-                             "expired 1")))
+         (define eng1 (eng 4
+              (lambda (ticks value) (display "enter complete 1\n") "complete 1")
+              (lambda (new-eng)
+                (display "enter expired 1\n")
+                (set! eng new-eng)
+                "expired 1")))
+         (display "eng1 finish\n")
          (display eng1)
          (display "\n")
-         (define eng2 (eng 5
-                           (lambda (ticks value) (display "enter complete 2\n") value)
-                           (lambda (new-eng)
-                             (display "enter expired 2\n")
-                             (set! eng new-eng)
-                             "expired 2")))
+         
+         (define eng2 (eng 4
+              (lambda (ticks value) (display "enter complete 2\n") "complete 2")
+              (lambda (new-eng)
+                (display "enter expired 2\n")
+                (set! eng new-eng)
+                "expired 2")))
+         (display "eng2 finish\n")
          (display eng2)
          (display "\n")
+
          (display "load finish"))
 
