@@ -30,6 +30,10 @@
              (define timer-handler
                (lambda ()
                  (display "timer handler\n")
+                 ;do-expire invoke escape so will not return directly
+                 ;only return way is invoking the cc, which is resume sent to do-expire
+                 ;when call eng again in expire procedure, it will call "(resume ticks)"
+                 ;which makes the code come back here
                  (start-timer (call/cc do-expire) timer-handler)))
              (define new-engine
                (lambda (resume)
@@ -80,17 +84,19 @@
               (fibonacci 3))))
          
          (define eng1 (eng 5
-                           (lambda (ticks value) (display "complete 1\n") value)
+                           (lambda (ticks value) (display "enter complete 1\n") value)
                            (lambda (new-eng)
-                             (display "expired 1\n")
-                             (set! eng new-eng))))
+                             (display "enter expired 1\n")
+                             (set! eng new-eng)
+                             "expired 1")))
          (display eng1)
          (display "\n")
          (define eng2 (eng 5
-                           (lambda (ticks value) (display "complete 2\n") value)
+                           (lambda (ticks value) (display "enter complete 2\n") value)
                            (lambda (new-eng)
-                             (display "expired 2\n")
-                             (set! eng new-eng))))
+                             (display "enter expired 2\n")
+                             (set! eng new-eng)
+                             "expired 2")))
          (display eng2)
          (display "\n")
          (display "load finish"))
