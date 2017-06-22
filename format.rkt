@@ -68,7 +68,7 @@
                                            recursive?)]
     [else (error "path does no exist:" path)]))
 
-;(start-parse "/Users/apple/Downloads/SplatBlit.cs" ".png,.html" #t)
+;(start-format "/Users/apple/Downloads/SplatBlit.cs" ".png,.html" #t)
 
 (require racket/cmdline)
 (define (main)
@@ -81,5 +81,5 @@
      (("-t" "--type") type "file type" (set! file-type type))
      (("-r" "--recursive") "recursive format" (set! recursive? #t))
      #:args (file-path)
-    (start-format file-path file-type recursive?))))
+     (start-format file-path file-type recursive?))))
 (main)
