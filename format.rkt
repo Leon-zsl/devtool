@@ -25,12 +25,10 @@
         (cons (string->bytes/utf-8 newline) (input-to-format-lines in)))))
 
 (define (format-lines-to-output out lines)
-  (cond
-    [(> (length lines) 0)
+  (when (> (length lines) 0)
      (write-bytes (car lines) out)
      (write-bytes (string->bytes/utf-8 "\n") out)
-     (format-lines-to-output out (cdr lines))]
-    [else (void)]))
+     (format-lines-to-output out (cdr lines))))
 
 (define (format-file file)
   (printf "format file:~a~n" file)
@@ -47,16 +45,15 @@
               (define p (path->string v))
               (cond
                 [(file-exists? p)
-                 (if (or (not type-list)
+                 (when (or (not type-list)
                          (member p type-list string=?)
                          (and (path-get-extension p)
                               (let ([ext (string-trim (bytes->string/utf-8 (path-get-extension p)) ".")])
                                 (member ext type-list string=?))))
-                     (format-file p)
-                     (void))]
+                     (format-file p))]
                 [recursive? (format-path p type-list recursive?)]))
             (directory-list path #:build? #t)))
-    
+
 (define (start-format path type recursive?)
   (printf "start parse...~npath:~a,type:~a,recursive:~a~n" path type recursive?)
   (define type-list (and type (string-split type ",")))

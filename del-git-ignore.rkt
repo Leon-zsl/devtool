@@ -4,18 +4,16 @@
 
 (define (find-and-delete-git-ignore in)
   (define line (read-line in 'any))
-  (if (not (eof-object? line))
+  (unless (eof-object? line)
       (let* ([file (string-trim line)]
              [non-empty? (non-empty-string? file)]
              [exist? (and non-empty? (or (file-exists? file) (directory-exists? file)))])
-        (if exist?
+        (when exist?
             ;(begin
             ;  (delete-directory/files file)
             ;  (printf "delete ignored file or dir:~a~n" file))
-            (delete-directory/files file)
-            (void))
-        (find-and-delete-git-ignore in))
-      (void)))
+            (delete-directory/files file))
+        (find-and-delete-git-ignore in))))
 
 (define (start-del-git-ignore path)
   (printf "del-git-ignore:~a~n" path)

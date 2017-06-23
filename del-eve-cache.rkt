@@ -70,14 +70,13 @@
               (cond [(directory-exists? cp)
                      (let ([path-list (directory-list cp #:build? #t)])
                        (for-each (λ (p)
-                                   (if (not (foldl
+                                   (unless (foldl
                                              (λ (ext result)
                                                (or result
                                                    (string-suffix? (path->string p) ext)))
                                              #f
-                                             ext-list))
-                                       (del-file-or-dir p)
-                                       (void)))
+                                             ext-list)
+                                       (del-file-or-dir p)))
                                  path-list))]
                     [(file-exists? cp) (del-file-or-dir cp)]
                     [else (void)]))
@@ -88,13 +87,12 @@
   (define type-list (or (and type-string (string-split type-string ",")) cache-type))
   (if (directory-exists? path)
       (begin
-        (if (member "lib" type-list string=?) (del-lib-folder) (void))
-        (if (member "bundle" type-list string=?) (del-bundle-folder path) (void))
-        (if (member "code" type-list string=?)
+        (when (member "lib" type-list string=?) (del-lib-folder))
+        (when (member "bundle" type-list string=?) (del-bundle-folder path))
+        (when (member "code" type-list string=?)
             (begin
               (del-code-folder path)
-              (del-code-folder-without path))
-            (void)))
+              (del-code-folder-without path))))
       (error "path does not exist:" path)))
 
 (require racket/cmdline)
@@ -108,4 +106,3 @@
      #:args (path)
      (start-del-eve-cache path type))))
 (main)
-  
