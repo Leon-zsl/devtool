@@ -29,6 +29,12 @@
               (g (lambda (x)
                    ((f f) x))))))
 
+         ;((Y g) '(1 2 3)) -> ((lambda (x) ((Y g) x)) '(1 2 3))
+         ; so (Y g) is (lambda (x) ((Y g) x)) == (lambda (x) ((k k) x)) where k is (lambda (f) (g (lambda (x) ((f f) x))))
+         ; in which (lambda (x) ((f f) x)) == (lambda (x) ((k k) x)) == (Y g)
+         ; so (Y g) == (g (Y g))
+         ; Applicative-order Y-Combinator
+ 
          (define rst1 ((Y
                         (lambda (len)
                           (lambda (l)
@@ -39,4 +45,7 @@
 
          (display rst1)
          (display "\n")
+
+         ;(define rst2 (Y Y))
+         ;(display rst2)
          )
