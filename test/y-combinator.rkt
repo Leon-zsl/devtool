@@ -34,6 +34,12 @@
          ; in which (lambda (x) ((f f) x)) == (lambda (x) ((k k) x)) == (Y g)
          ; so (Y g) == (g (Y g))
          ; Applicative-order Y-Combinator
+
+         ;key point:
+         ;(lambda (x) ((f f) x)) is lazy version of (f f), in which f is
+         ;(lambda (f) (g (lambda (x) ((f f) x)))), and (f f) is (Y g)
+         ;so (lambda (x) ((f f) x)) is lazy version of (Y g)
+         ;so evalute (Y g) => evalute (g (Y g)), in which the 2nd (Y g) is lazy version
  
          (define rst1 ((Y
                         (lambda (len)
