@@ -1,57 +1,41 @@
-#lang r6rs
+#lang racket
 
-(library (y-combinator)
-         (export test)
-         (import (rnrs))
+(define rst (((lambda (le)
+                ((lambda (mk-length)
+                   (mk-length mk-length))
+                 (lambda (mk-length)
+                   (le (lambda (x)
+                         ((mk-length mk-length) x))))))
+              (lambda (length)
+                (lambda (l)
+                  (cond
+                    [(null? l) 0]
+                    [else (+ 1 (length (cdr l)))]))))
+             '(1 2 3 4 5 6 7 8)))
+(displayln rst)
 
-         (define test 0)
-         (define test0 1)
-         (set! test0 1)
+; Applicative-order Y-Combinator
+(define (Y g)
+  ((lambda (f) (f f))
+   (lambda (f)
+     (g (lambda (x)
+          ((f f) x))))))
 
-         (define rst (((lambda (le)
-                         ((lambda (mk-length)
-                            (mk-length mk-length))
-                          (lambda (mk-length)
-                            (le (lambda (x)
-                                  ((mk-length mk-length) x))))))
-                       (lambda (length)
-                         (lambda (l)
-                           (cond
-                             [(null? l) 0]
-                             [else (+ 1 (length (cdr l)))]))))
-                      '(1 2 3 4 5 6 7 8)))
-         (display rst)
-         (display "\n")
-
-         (define (Y g)
-           ((lambda (f) (f f))
-            (lambda (f)
-              (g (lambda (x)
-                   ((f f) x))))))
-
-         ;((Y g) '(1 2 3)) -> ((lambda (x) ((Y g) x)) '(1 2 3))
-         ; so (Y g) is (lambda (x) ((Y g) x)) == (lambda (x) ((k k) x)) where k is (lambda (f) (g (lambda (x) ((f f) x))))
-         ; in which (lambda (x) ((f f) x)) == (lambda (x) ((k k) x)) == (Y g)
-         ; so (Y g) == (g (Y g))
-         ; Applicative-order Y-Combinator
-
-         ;key point:
-         ;(lambda (x) ((f f) x)) is lazy version of (f f), in which f is
-         ;(lambda (f) (g (lambda (x) ((f f) x)))), and (f f) is (Y g)
-         ;so (lambda (x) ((f f) x)) is lazy version of (Y g)
-         ;so evalute (Y g) => evalute (g (Y g)), in which the 2nd (Y g) is lazy version
+;key point:
+;(lambda (x) ((f f) x)) is lazy version of (f f), in which f is
+;(lambda (f) (g (lambda (x) ((f f) x)))), and (f f) is (Y g)
+;so (lambda (x) ((f f) x)) is lazy version of (Y g)
+;so evalute (Y g) => evalute (g (Y g)), in which the 2nd (Y g) is lazy version
  
-         (define rst1 ((Y
-                        (lambda (len)
-                          (lambda (l)
-                            (cond
-                              [(null? l) 0]
-                              [else (+ 1 (len (cdr l)))]))))
-                       '(1 2 3 4 5 6)))
+(define rst1 ((Y
+               (lambda (len)
+                 (lambda (l)
+                   (cond
+                     [(null? l) 0]
+                     [else (+ 1 (len (cdr l)))]))))
+              '(1 2 3 4 5 6)))
+(displayln rst1)
 
-         (display rst1)
-         (display "\n")
-
-         ;(define rst2 (Y Y))
-         ;(display rst2)
-         )
+;(define rst2 (Y Y))
+;(display rst2)
+;inifinity in strict version
