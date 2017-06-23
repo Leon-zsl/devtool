@@ -26,6 +26,7 @@
 ;(lambda (f) (g (lambda (x) ((f f) x)))), and (f f) is (Y g)
 ;so (lambda (x) ((f f) x)) is lazy version of (Y g)
 ;so evalute (Y g) => evalute (g (Y g)), in which the 2nd (Y g) is lazy version
+;so it means fixed point
  
 (define rst1 ((Y
                (λ (len)
@@ -39,3 +40,23 @@
 ;(define rst2 (Y Y))
 ;(display rst2)
 ;inifinity in strict version
+
+;another version
+;in lazy
+(define Y 
+  (lambda (f)
+    ((lambda (x) (x x))
+     (lambda (x) (f (x x))))))
+
+;equals
+
+(define Y 
+  (lambda (f)
+    ((lambda (x) (f (x x)))
+      (lambda (x) (f (x x))))))
+
+;to strict version
+(define Y 
+    (lambda (f)
+      ((lambda (x) (f (lambda (y) ((x x) y))))
+       (lambda (x) (f (lambda (y) ((x x) y)))))))
