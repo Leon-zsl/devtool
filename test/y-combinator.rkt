@@ -1,13 +1,13 @@
 #lang racket
 
-(define rst (((lambda (le)
-                ((lambda (mk-length)
+(define rst (((λ (le)
+                ((λ (mk-length)
                    (mk-length mk-length))
-                 (lambda (mk-length)
-                   (le (lambda (x)
+                 (λ (mk-length)
+                   (le (λ (x)
                          ((mk-length mk-length) x))))))
-              (lambda (length)
-                (lambda (l)
+              (λ (length)
+                (λ (l)
                   (cond
                     [(null? l) 0]
                     [else (+ 1 (length (cdr l)))]))))
@@ -16,9 +16,9 @@
 
 ; Applicative-order Y-Combinator
 (define (Y g)
-  ((lambda (f) (f f))
-   (lambda (f)
-     (g (lambda (x)
+  ((λ (f) (f f))
+   (λ (f)
+     (g (λ (x)
           ((f f) x))))))
 
 ;key point:
@@ -28,8 +28,8 @@
 ;so evalute (Y g) => evalute (g (Y g)), in which the 2nd (Y g) is lazy version
  
 (define rst1 ((Y
-               (lambda (len)
-                 (lambda (l)
+               (λ (len)
+                 (λ (l)
                    (cond
                      [(null? l) 0]
                      [else (+ 1 (len (cdr l)))]))))
